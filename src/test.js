@@ -1,41 +1,37 @@
 import React, { Component } from 'react';
 import Geocode from "react-geocode";
-import Client from 'predicthq'
 import MapContainer from "./components/MapContainer"
 import MenuContainer from "./components/MenuContainer"
 import './App.css';
 
-const googleApiKey = "AIzaSyCPi0o_tjNjKYYDe_6nYg82r0leI7kKlOE"
-const access_token = "ucCoNPxEF2q0ksvstmLAUQJaebXdZh"
-
 class App extends Component {
+
+	apiKey () {
+		const key = "AIzaSyCPi0o_tjNjKYYDe_6nYg82r0leI7kKlOE"
+		return key
+	}
 
 	constructor(props) {
 		super(props);
 		this.state = {
 			locations: [
 				{
-                    'name': 'Willow Grove Park Mall',
-                    'latitude': 40.1422472,
-                    'longitude': -75.12231700000001,
+                    'latitude': 40.140171522163406,
+                    'longitude': -75.12365341186523,
                 },
-                {   
-                    'name': 'Franklin Mills Mall',
+                {
                     'latitude': 40.0874923,
                     'longitude': -74.96162270000002,
                 },
                 {
-                    'name': 'Wissahickon Valley Park',
                     'latitude': 40.0562108,
                     'longitude': -75.217331,
                 },
                 {
-                    'name': 'Six Flags Great Adventure',
                     'latitude': 40.1415382,
                     'longitude': -74.44769610000003,
                 },
                 {
-                    'name': 'Ocean beach',
                     'latitude': 39.642897,
                     'longitude': -74.18041590000001,
                 }
@@ -63,22 +59,31 @@ class App extends Component {
 
 	componentDidMount() {
         window.initMap = this.initMap;
-        this.loadMapJS('https://maps.googleapis.com/maps/api/js?key='+googleApiKey+'&callback=initMap')
-        this.getPredictInfo()
-
+        this.loadMapJS('https://maps.googleapis.com/maps/api/js?key='+this.apiKey()+'&callback=initMap')
+        //this.getLocationDetails()
     }
 
-    componentWillMount() {
-        this.setState({
-            'locations': this.state.locations
+    getLocationDetails () {
+    	var locationsDetails = []
+    	Geocode.setApiKey(this.apiKey());
+    	this.state.locations.forEach(function (location) {
+    		Geocode.fromLatLng(location.latitude, location.longitude).then(
+  				response => {
+    				const address = response.results[0].formatted_address;
+    				location.longname = address;
+            		locationsDetails.push(location);
+  				})
+    	})
+    	this.setState({
+            'locations': locationsDetails
         });
     }
-
 
     initMap() {
     	var self = this
         var mapview = document.getElementById('map');
         mapview.style.height = window.innerHeight + "px";
+
         var map = new window.google.maps.Map(mapview, {
             center: {lat: 39.9525839, lng: -75.16522150000003},
             zoom: 10,
@@ -92,13 +97,14 @@ class App extends Component {
         });
 
         var locationsMarker = [];
+        
         this.state.locations.forEach(function (location) {
             var marker = new window.google.maps.Marker({
                 position: new window.google.maps.LatLng(location.latitude, location.longitude),
                 animation: window.google.maps.Animation.DROP,
                 map: map
             });
-            location.longname = self.getLocationDetails();
+            var longname = 
             location.marker = marker;
             location.display = true;
             locationsMarker.push(location);
@@ -119,48 +125,10 @@ class App extends Component {
         });      
     } 
 
-      getPredictInfo() {
-        var locationsEvents = []
-        var title = []
-        var start = []
-        let client = new Client({access_token})
-        this.state.locations.forEach(function (location) {
-            client.events.search({'within': '1km@'+location.latitude+','+location.longitude, 'limit':5}).then((results)=>{
-                 for (let event of results){
-                    title = event.title
-                    //console.log(event.title + " " + location.name)
-                    start = event.start
-                    // locationsEvents.push(location)
-                 }
-                 
-                    console.log(title)         
-            })
-
-        })
-        
-    }
-
-    getLocationDetails () {
-        var locationsDetails = []
-        Geocode.setApiKey(googleApiKey);
-        this.state.locations.forEach(function (location) {
-            Geocode.fromLatLng(location.latitude, location.longitude).then(
-                response => {
-                    const address = response.results[0].formatted_address;
-                    location.longname = address;
-                    locationsDetails.push(location);
-                })
-        })
-        this.setState({
-            'locations': locationsDetails
-        });
-    }
-
-    
-
     openInfoWindow(marker) {
     	this.closeInfoWindow()
         this.state.infowindow.open(this.state.map, marker);
+        //{console.log(marker)}
         marker.setAnimation(window.google.maps.Animation.BOUNCE);
         this.setState({
             'prevmarker': marker
@@ -175,7 +143,7 @@ class App extends Component {
     	var info = infoMarker.filter((im) => im.latitude === marker.getPosition().lat() && im.longitude === marker.getPosition().lng())
     	this.state.infowindow.setContent(
     			info[0].longname
-    		)
+    		);	
     }
 
     closeInfoWindow() {

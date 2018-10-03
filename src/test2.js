@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import Geocode from "react-geocode";
-import Client from 'predicthq'
 import MapContainer from "./components/MapContainer"
 import MenuContainer from "./components/MenuContainer"
 import './App.css';
 
-const googleApiKey = "AIzaSyCPi0o_tjNjKYYDe_6nYg82r0leI7kKlOE"
-const access_token = "ucCoNPxEF2q0ksvstmLAUQJaebXdZh"
+
+const gAPI = "AIzaSyCPi0o_tjNjKYYDe_6nYg82r0leI7kKlOE"
+const fAPI = ""
 
 class App extends Component {
 
@@ -63,9 +63,7 @@ class App extends Component {
 
 	componentDidMount() {
         window.initMap = this.initMap;
-        this.loadMapJS('https://maps.googleapis.com/maps/api/js?key='+googleApiKey+'&callback=initMap')
-        this.getPredictInfo()
-
+        this.loadMapJS('https://maps.googleapis.com/maps/api/js?key='+{gAPI}+'&callback=initMap')
     }
 
     componentWillMount() {
@@ -74,6 +72,21 @@ class App extends Component {
         });
     }
 
+    getLocationDetails () {
+    	var locationsDetails = []
+    	Geocode.setApiKey({gAPI});
+    	this.state.locations.forEach(function (location) {
+    		Geocode.fromLatLng(location.latitude, location.longitude).then(
+  				response => {
+    				const address = response.results[0].formatted_address;
+    				location.longname = address;
+            		locationsDetails.push(location);
+  				})
+    	})
+    	this.setState({
+            'locations': locationsDetails
+        });
+    }
 
     initMap() {
     	var self = this
@@ -119,45 +132,6 @@ class App extends Component {
         });      
     } 
 
-      getPredictInfo() {
-        var locationsEvents = []
-        var title = []
-        var start = []
-        let client = new Client({access_token})
-        this.state.locations.forEach(function (location) {
-            client.events.search({'within': '1km@'+location.latitude+','+location.longitude, 'limit':5}).then((results)=>{
-                 for (let event of results){
-                    title = event.title
-                    //console.log(event.title + " " + location.name)
-                    start = event.start
-                    // locationsEvents.push(location)
-                 }
-                 
-                    console.log(title)         
-            })
-
-        })
-        
-    }
-
-    getLocationDetails () {
-        var locationsDetails = []
-        Geocode.setApiKey(googleApiKey);
-        this.state.locations.forEach(function (location) {
-            Geocode.fromLatLng(location.latitude, location.longitude).then(
-                response => {
-                    const address = response.results[0].formatted_address;
-                    location.longname = address;
-                    locationsDetails.push(location);
-                })
-        })
-        this.setState({
-            'locations': locationsDetails
-        });
-    }
-
-    
-
     openInfoWindow(marker) {
     	this.closeInfoWindow()
         this.state.infowindow.open(this.state.map, marker);
@@ -175,7 +149,7 @@ class App extends Component {
     	var info = infoMarker.filter((im) => im.latitude === marker.getPosition().lat() && im.longitude === marker.getPosition().lng())
     	this.state.infowindow.setContent(
     			info[0].longname
-    		)
+    		);	
     }
 
     closeInfoWindow() {
