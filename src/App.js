@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import Geocode from "react-geocode";
-import Client from 'predicthq'
+import MetaTags from 'react-meta-tags';
 import MapContainer from "./components/MapContainer"
 import MenuContainer from "./components/MenuContainer"
 import './App.css';
 
 const googleApiKey = "AIzaSyCPi0o_tjNjKYYDe_6nYg82r0leI7kKlOE"
-const access_token = "ucCoNPxEF2q0ksvstmLAUQJaebXdZh"
+const foursquareID = "TKLPMSYOV2KSID0WIQVQQ0A1B52RJ1USZCOQB0ZOGSGVAND3"
+const foursquareSecret = "5DQQGPX2Q114F10ZYW4IPHJ5K5DROGSZTOOOPCC3QZZAFXS1"
 
 class App extends Component {
 
@@ -35,9 +36,14 @@ class App extends Component {
                     'longitude': -74.44769610000003,
                 },
                 {
-                    'name': 'Ocean beach',
+                    'name': 'Ship Boottom',
                     'latitude': 39.642897,
                     'longitude': -74.18041590000001,
+                },
+                {
+                    'name': 'Niagara Falls',
+                    'latitude': 43.0962143,
+                    'longitude': -79.0377388,
                 }
 
             ],
@@ -64,8 +70,6 @@ class App extends Component {
 	componentDidMount() {
         window.initMap = this.initMap;
         this.loadMapJS('https://maps.googleapis.com/maps/api/js?key='+googleApiKey+'&callback=initMap')
-        this.getPredictInfo()
-
     }
 
     componentWillMount() {
@@ -74,7 +78,6 @@ class App extends Component {
         });
     }
 
-
     initMap() {
     	var self = this
         var mapview = document.getElementById('map');
@@ -82,6 +85,8 @@ class App extends Component {
         var map = new window.google.maps.Map(mapview, {
             center: {lat: 39.9525839, lng: -75.16522150000003},
             zoom: 10,
+            mapTypeControl: false,
+            streetViewControl: false
         });
 
         var InfoWindow = new window.google.maps.InfoWindow({});
@@ -116,29 +121,8 @@ class App extends Component {
         });
         window.google.maps.event.addListener(map, 'click', function () {
             self.closeInfoWindow();
-        });      
+        });   
     } 
-
-      getPredictInfo() {
-        var locationsEvents = []
-        var title = []
-        var start = []
-        let client = new Client({access_token})
-        this.state.locations.forEach(function (location) {
-            client.events.search({'within': '1km@'+location.latitude+','+location.longitude, 'limit':5}).then((results)=>{
-                 for (let event of results){
-                    title = event.title
-                    //console.log(event.title + " " + location.name)
-                    start = event.start
-                    // locationsEvents.push(location)
-                 }
-                 
-                    console.log(title)         
-            })
-
-        })
-        
-    }
 
     getLocationDetails () {
         var locationsDetails = []
@@ -156,8 +140,6 @@ class App extends Component {
         });
     }
 
-    
-
     openInfoWindow(marker) {
     	this.closeInfoWindow()
         this.state.infowindow.open(this.state.map, marker);
@@ -170,12 +152,32 @@ class App extends Component {
         this.getMarkerInfo(marker);
     }
 
+    getFoursquareQuery(marker) {
+        var url = "https://api.foursquare.com/v2/venues/search?client_id=" + foursquareID + "&client_secret=" + foursquareSecret + "&v=20130815&ll=" + marker.getPosition().lat() + "," + marker.getPosition().lng() + "&limit=1";
+        return url 
+    }
+
     getMarkerInfo(marker) {
-    	var infoMarker = this.state.locations
-    	var info = infoMarker.filter((im) => im.latitude === marker.getPosition().lat() && im.longitude === marker.getPosition().lng())
-    	this.state.infowindow.setContent(
-    			info[0].longname
-    		)
+        var self = this;
+        var infoMarker = this.state.locations
+        var info = infoMarker.filter((im) => im.latitude === marker.getPosition().lat() && im.longitude === marker.getPosition().lng())
+        fetch(this.getFoursquareQuery(marker))
+            .then(
+                function (response) {
+                    if (response.status !== 200) {
+                        self.state.infowindow.setContent("Sorry data can't be loaded");
+                        return;
+                    }
+                    response.json().then(function (data) {
+                        var location_data = data.response.venues[0];
+                        var readMore = '<p><a href="https://foursquare.com/v/'+ location_data.id +'" target="_blank">Read More on Foursquare Website</a></p>'
+                        self.state.infowindow.setContent('<div class="infoWindow">'+info[0].longname + readMore+'</div>');
+                    });
+                }
+            )
+            .catch(function (err) {
+                self.state.infowindow.setContent("Sorry data can't be loaded");
+            });
     }
 
     closeInfoWindow() {
@@ -194,6 +196,9 @@ class App extends Component {
     
     return (
       <div className="main">
+      <MetaTags>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      </MetaTags>
       	<MenuContainer 
       		locations={locations}
       		openInfoWindow={this.openInfoWindow}

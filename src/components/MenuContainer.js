@@ -10,32 +10,32 @@ class MenuCointainer extends Component {
 	}
 
 	componentWillMount() {
-        this.setState({
-            'locations': this.props.locations
-        });
-    }
+    this.setState({
+      'locations': this.props.locations
+      });
+  }
 
 	updateQuery = (query) => {
 		this.setState({query})
 	}
 
 	searchLocations(event) {
-        var locations = [];
-        this.props.locations.forEach(function (location) {
-        	location.marker.setVisible(false);
-        	if (location.longname.toLowerCase().indexOf(event.toLowerCase()) >= 0){
-        		location.marker.setVisible(true);
-        		locations.push(location);
-        	}	
-        })
-        this.setState({
-        	'locations': locations,
-        	'query': event
-    	})
-        }
+    this.props.closeInfoWindow()
+    var locations = [];
+    this.props.locations.forEach(function (location) {
+     	location.marker.setVisible(false);
+      if (location.longname.toLowerCase().indexOf(event.toLowerCase()) >= 0){
+      	location.marker.setVisible(true);
+      	locations.push(location);
+      }	
+    })
+    this.setState({
+    	'locations': locations,
+     	'query': event
+    })
+  }
 
-  	render() {
-
+  render() {
   	const { query } = this.state
   	const { locations } = this.state
     
@@ -46,7 +46,7 @@ class MenuCointainer extends Component {
         		<DebounceInput
             		minLength={1}
             		debounceTimeout={300}
-            		placeholder="enter place"
+            		placeholder="search"
             		value={query}
             		onChange={(event) => this.searchLocations(event.target.value)}
         			/>
