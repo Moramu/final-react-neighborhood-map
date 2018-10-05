@@ -56,6 +56,7 @@ class App extends Component {
 		this.openInfoWindow = this.openInfoWindow.bind(this);
 	}
 
+    //Async loading script
 	loadMapJS(src) {
     	var ref = window.document.getElementsByTagName("script")[0];
     	var script = window.document.createElement("script");
@@ -78,6 +79,7 @@ class App extends Component {
         });
     }
 
+    //initialization map with markers
     initMap() {
     	var self = this
         var mapview = document.getElementById('map');
@@ -124,6 +126,7 @@ class App extends Component {
         });   
     } 
 
+    //geting data for marker using Geocode
     getLocationDetails () {
         var locationsDetails = []
         Geocode.setApiKey(googleApiKey);
@@ -140,6 +143,7 @@ class App extends Component {
         });
     }
 
+    
     openInfoWindow(marker) {
     	this.closeInfoWindow()
         this.state.infowindow.open(this.state.map, marker);

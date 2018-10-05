@@ -6,7 +6,9 @@ class MapContainer extends Component {
   	render() {
     	return (
       		<div className="mapContainer">
-    			<div id="map"></div>
+      		<main role="presentation"  aria-label="Map showing places" className="main-container">
+    			<div id="map" aria-label="map"></div>
+    		</main>
       		</div>
     	)
   	}

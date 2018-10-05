@@ -40,10 +40,11 @@ class MenuCointainer extends Component {
   	const { locations } = this.state
     
     return (
-      <div className="menuContainer">
-      	<div className="search">		
-			<form className="input-search">
+      <div className="menuContainer" aria-label="Location Menu">
+      <div className="search">		
+			 <form className="input-search" aria-label="Search location" >
         		<DebounceInput
+                aria-label="Search location"
             		minLength={1}
             		debounceTimeout={300}
             		placeholder="search"
@@ -52,10 +53,12 @@ class MenuCointainer extends Component {
         			/>
 			</form>
 		</div>
-		<div className="listPlaces">
+		<div className="listPlaces" aria-label="List locations">
 			{locations.map((location,index) => (
-				<ul key={index}>
-					<li
+				<ul key={index} aria-label="list locations">
+					<li 
+          aria-label={location.name}
+          tabIndex="2"
 					onClick={this.props.openInfoWindow.bind(this, locations[index].marker)}								
 					 >{location.name}</li>
 				</ul>

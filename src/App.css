@@ -23,6 +23,9 @@ input {
   width: 90%;
 }
 
+li:active, li:focus {border: 5px}
+
+
 
 @media (min-width: 200px) and (max-width: 750px){ 
   .menuContainer {

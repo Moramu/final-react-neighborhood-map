@@ -2,7 +2,7 @@
 ---
 
 ## Project Overview:
-Initial Commit
+This project uses React as well as the Google Map API and FourSquare API to display my favourite places.
 
 ### Getting Started
 1. Download and unpack [archive](https://github.com/Moramu/final-react-neighborhood-map).
