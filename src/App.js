@@ -5,9 +5,9 @@ import MapContainer from "./components/MapContainer"
 import MenuContainer from "./components/MenuContainer"
 import './App.css';
 
-const googleApiKey = "AIzaSyCPi0o_tjNjKYYDe_6nYg82r0leI7kKlOE"
-const foursquareID = "TKLPMSYOV2KSID0WIQVQQ0A1B52RJ1USZCOQB0ZOGSGVAND3"
-const foursquareSecret = "5DQQGPX2Q114F10ZYW4IPHJ5K5DROGSZTOOOPCC3QZZAFXS1"
+const googleApiKey = "Your APIkey"
+const foursquareID = "Your APIkey"
+const foursquareSecret = "Your APIkey"
 
 class App extends Component {
 
@@ -143,7 +143,7 @@ class App extends Component {
         });
     }
 
-    
+
     openInfoWindow(marker) {
     	this.closeInfoWindow()
         this.state.infowindow.open(this.state.map, marker);
