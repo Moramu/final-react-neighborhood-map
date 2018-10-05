@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-import Geocode from "react-geocode";
 import MetaTags from 'react-meta-tags';
 import MapContainer from "./components/MapContainer"
 import MenuContainer from "./components/MenuContainer"
 import './App.css';
 
-const googleApiKey = ""
+const googleApiKey = "Your APIkey"
 const foursquareID = "Your APIkey"
 const foursquareSecret = "Your APIkey"
 
@@ -134,15 +133,19 @@ class App extends Component {
     //geting data for marker using Geocode
     getLocationDetails () {
         var locationsDetails = []
-        Geocode.setApiKey(googleApiKey);
         this.state.locations.forEach(function (location) {
-            Geocode.fromLatLng(location.latitude, location.longitude).then(
-                response => {
-                    const address = response.results[0].formatted_address;
-                    location.longname = address;
-                    locationsDetails.push(location);
-                })
-        })
+            var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+location.latitude+","+location.longitude+"&key="+googleApiKey
+            fetch(url).then(
+                 function (response) {
+                    response.json().then(function (data) {
+                       if(data.status !== "REQUEST_DENIED" && data.status !=="OVER_QUERY_LIMIT"){
+                        const address = data.results[0].formatted_address;
+                        location.longname = address;
+                        locationsDetails.push(location);
+                       } 
+                    });
+                }
+            )})
         this.setState({
             'locations': locationsDetails
         });
@@ -150,6 +153,7 @@ class App extends Component {
 
 
     openInfoWindow(marker) {
+        //console.log(this.state.locations)
     	this.closeInfoWindow()
         this.state.infowindow.open(this.state.map, marker);
         marker.setAnimation(window.google.maps.Animation.BOUNCE);
