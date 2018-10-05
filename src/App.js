@@ -5,7 +5,7 @@ import MapContainer from "./components/MapContainer"
 import MenuContainer from "./components/MenuContainer"
 import './App.css';
 
-const googleApiKey = "Your APIkey"
+const googleApiKey = ""
 const foursquareID = "Your APIkey"
 const foursquareSecret = "Your APIkey"
 
@@ -71,12 +71,17 @@ class App extends Component {
 	componentDidMount() {
         window.initMap = this.initMap;
         this.loadMapJS('https://maps.googleapis.com/maps/api/js?key='+googleApiKey+'&callback=initMap')
+        window.gm_authFailure = this.gm_authFailure
     }
 
     componentWillMount() {
         this.setState({
             'locations': this.state.locations
         });
+    }
+
+    gm_authFailure(){
+        window.alert("Google Maps error!")
     }
 
     //initialization map with markers

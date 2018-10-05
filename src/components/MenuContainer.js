@@ -24,7 +24,7 @@ class MenuCointainer extends Component {
     var locations = [];
     this.props.locations.forEach(function (location) {
      	location.marker.setVisible(false);
-      if (location.longname.toLowerCase().indexOf(event.toLowerCase()) >= 0){
+      if (location.name.toLowerCase().indexOf(event.toLowerCase()) >= 0){
       	location.marker.setVisible(true);
       	locations.push(location);
       }	
